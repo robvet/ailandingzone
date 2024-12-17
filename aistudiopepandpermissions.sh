@@ -61,9 +61,9 @@ az network private-endpoint create --resource-group $rg --connection-name "psc-a
 # A Record entries for AI Hub
 
 # For privatelink.notebooks.azure.net
-$resourceGroup="eastus2-fxs-ops-private-dns-rg"
+$resourceGroup="<Your RG>"
 $dnsZoneName="privatelink.notebooks.azure.net"
-$recordSetName="ml-cebsaistudiodev-eastus2-45c2b0e4-f2ed-4aab-89ed-f788168d84f8.eastus2"
+$recordSetName="ml-abc-eastus2-{GUID}.eastus2"
 $privateIpAddress="172.19.80.11"
 
 az network dns record-set a add-record --resource-group $resourceGroup --zone-name $dnsZoneName --record-set-name $recordSetName --ipv4-address $privateIpAddress
@@ -71,68 +71,68 @@ az network dns record-set a add-record --resource-group $resourceGroup --zone-na
 # Four A Record entries for privatelink.api.azureml.ms
 #
 # first A Record entry
-$resourceGroup="eastus2-fxs-ops-private-dns-rg"
+$resourceGroup="<Your RG>"
 $dnsZoneName="privatelink.api.azureml.ms"
-$recordSetName="45c2b0e4-f2ed-4aab-89ed-f788168d84f8.workspace.eastus2"
+$recordSetName="{GUID}.workspace.eastus2"
 $privateIpAddress="172.19.80.10"
 az network dns record-set a add-record --resource-group $resourceGroup --zone-name $dnsZoneName --record-set-name $recordSetName --ipv4-address $privateIpAddress
 
 
 # second A Record entry
-$resourceGroup="eastus2-fxs-ops-private-dns-rg"
+$resourceGroup="<Your RG>"
 $dnsZoneName="privatelink.api.azureml.ms"
-$recordSetName="45c2b0e4-f2ed-4aab-89ed-f788168d84f8.workspace.eastus2.cert"
+$recordSetName="{GUID}.workspace.eastus2.cert"
 $privateIpAddress="172.19.80.10"
 az network dns record-set a add-record --resource-group $resourceGroup --zone-name $dnsZoneName --record-set-name $recordSetName --ipv4-address $privateIpAddress
 
 # third A Record entry
-$resourceGroup="eastus2-fxs-ops-private-dns-rg"
+$resourceGroup="<Your RG>"
 $dnsZoneName="privatelink.api.azureml.ms"
-$recordSetName="*.45c2b0e4-f2ed-4aab-89ed-f788168d84f8.inference.eastus2"
+$recordSetName="*.{GUID}.inference.eastus2"
 $privateIpAddress="172.19.80.12"
 az network dns record-set a add-record --resource-group $resourceGroup --zone-name $dnsZoneName --record-set-name $recordSetName --ipv4-address $privateIpAddress
 
 
 # fourth A Record entry
-$resourceGroup="eastus2-fxs-ops-private-dns-rg"
+$resourceGroup="<Your RG>"
 $dnsZoneName="privatelink.api.azureml.ms"
-$recordSetName="*.45c2b0e4-f2ed-4aab-89ed-f788168d84f8.models.eastus2"
+$recordSetName="*.{GUID}.models.eastus2"
 $privateIpAddress="172.19.80.13"
 az network dns record-set a add-record --resource-group $resourceGroup --zone-name $dnsZoneName --record-set-name $recordSetName --ipv4-address $privateIpAddress
 
 # A Record entries for Azure Blob Storage endpoint
-$resourceGroup="eastus2-fxs-ops-private-dns-rg"
+$resourceGroup="<Your RG>"
 $dnsZoneName="privatelink.blob.core.windows.net"
-$recordSetName="cebsstorageaidev"
+$recordSetName="abcstorageaidev"
 $privateIpAddress="172.19.80.4"
 az network dns record-set a add-record --resource-group $resourceGroup --zone-name $dnsZoneName --record-set-name $recordSetName --ipv4-address $privateIpAddress
 
 # A Record entries for Azure Data Lake Storage endpoint
-$resourceGroup="eastus2-fxs-ops-private-dns-rg"
+$resourceGroup="<Your RG>"
 $dnsZoneName="privatelink.dfs.core.windows.net"
-$recordSetName="cebsstorageaidev"
+$recordSetName="abcstorageaidev"
 $privateIpAddress="172.19.80.5"
 az network dns record-set a add-record --resource-group $resourceGroup --zone-name $dnsZoneName --record-set-name $recordSetName --ipv4-address $privateIpAddress
 
 # A Record entries for Azure OpenAI Account
-$resourceGroup="eastus2-fxs-ops-private-dns-rg"
+$resourceGroup="<Your RG>"
 $dnsZoneName="privatelink.openai.azure.com"
-$recordSetName="cebsopenaidev"
+$recordSetName="abcopenaidev"
 $privateIpAddress="172.19.80.9"
 az network dns record-set a add-record --resource-group $resourceGroup --zone-name $dnsZoneName --record-set-name $recordSetName --ipv4-address $privateIpAddress
 
 # A Record entry for Key Vault
-$resourceGroup="eastus2-fxs-ops-private-dns-rg"
+$resourceGroup="<Your RG>"
 $dnsZoneName="privatelink.vaultcore.azure.net"
-$recordSetName="cebskvaidev"
+$recordSetName="abckvaidev"
 $privateIpAddress="172.19.80.8"
 az network dns record-set a add-record --resource-group $resourceGroup --zone-name $dnsZoneName --record-set-name $recordSetName --ipv4-address $privateIpAddress
 
 
 # A Record entry for the Azure Container Registry
-$resourceGroup="eastus2-fxs-ops-private-dns-rg"
+$resourceGroup="<Your RG>"
 $dnsZoneName="privatelink.azurecr.io"
-$recordSetName="cebscraidev"
+$recordSetName="abccraidev"
 $privateIpAddress="172.19.80.7"
 az network dns record-set a add-record --resource-group $resourceGroup --zone-name $dnsZoneName --record-set-name $recordSetName --ipv4-address $privateIpAddress
 
