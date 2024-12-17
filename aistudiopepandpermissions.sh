@@ -61,7 +61,7 @@ az network private-endpoint create --resource-group $rg --connection-name "psc-a
 # A Record entries for AI Hub
 
 # For privatelink.notebooks.azure.net
-$resourceGroup="<Your RG>"
+$resourceGroup="<Your RG>" ## Your platform resource group
 $dnsZoneName="privatelink.notebooks.azure.net"
 $recordSetName="ml-abc-eastus2-{GUID}.eastus2"
 $privateIpAddress="172.19.80.11"
