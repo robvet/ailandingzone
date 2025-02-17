@@ -29,31 +29,60 @@
 # - `private_endpoint_ids`: The IDs of the private endpoints.
 
 ## Usage
-
 terraform {
   required_providers {
     azurerm = {
-      source                = "hashicorp/azurerm"
-      version               = "~> 3.80"
+      source  = "hashicorp/azurerm"
+      version = "4.19.0"
       configuration_aliases = [azurerm.platform, azurerm.analytics]
+    }
+    azapi = {
+      source  = "Azure/azapi"
     }
   }
 }
 
-resource "azurerm_cognitive_account" "this" {
-  provider                      = azurerm.analytics
-  name                          = var.cognitive_name
-  kind                          = var.cognitive_kind
-  sku_name                      = var.cognitive_sku
-  location                      = var.location
-  resource_group_name           = var.resource_group_name
-  public_network_access_enabled = false
-  custom_subdomain_name         = lower(var.cognitive_name)
-  dynamic_throttling_enabled    = false
+
+resource "azurerm_ai_services" "this" {
+  name                = var.cognitive_name
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  sku_name            = "S0"
   identity {
     type = "SystemAssigned"
   }
+  public_network_access = "Disabled"
+  custom_subdomain_name = lower(var.cognitive_name)
+
 }
+
+/*
+resource "azapi_resource" "this"{
+  type = "Microsoft.CognitiveServices/accounts@2024-10-01"
+  name = var.cognitive_name
+  location = var.location
+  parent_id = "/subscriptions/aa8123d8-cdcc-443a-a2a1-a0ed191da95c/resourceGroups/rg-ai-prod-new"
+  identity {
+    type = "SystemAssigned"
+  }
+
+  body = {
+    "name" = var.cognitive_name,
+    "properties" = {
+      "customSubDomainName" = lower(var.cognitive_name),
+      "apiProperties" = {
+            "statisticsEnabled" = "false"
+        }
+    },
+    "kind" = "AIServices",
+    "sku" = {
+        "name" = var.cognitive_sku
+    }
+    }
+
+  response_export_values = ["*"]
+}
+*/
 
 # data resource to get the vnet
 data "azurerm_virtual_network" "this" {
@@ -87,7 +116,7 @@ resource "azurerm_private_endpoint" "endpoint" {
 
   private_service_connection {
     name                           = var.cognitive_private_endpoint_name
-    private_connection_resource_id = azurerm_cognitive_account.this.id
+    private_connection_resource_id = azurerm_ai_services.this.id
     is_manual_connection           = false
     subresource_names              = ["account"]
   }
@@ -100,51 +129,34 @@ resource "azurerm_private_endpoint" "endpoint" {
 
 resource "azurerm_cognitive_deployment" "deployment" {
   provider             = azurerm.analytics
-  for_each             = { for idx, deployment in var.deployments : idx => deployment }
-  name                 = each.value.name
-  cognitive_account_id = azurerm_cognitive_account.this.id
+  for_each             = var.deployments
+  name                 = each.value.model.name
+  cognitive_account_id = azurerm_ai_services.this.id
   rai_policy_name      = each.value.model.rai_policy_name
   model {
     format  = each.value.model.format
     name    = each.value.model.name
     version = each.value.model.version
   }
+  sku {
+    name   = "Standard"
+  }
+/*
   scale {
     type     = each.value.sku.name
     capacity = each.value.sku.capacity
   }
-
+*/
   depends_on = [
-    azurerm_cognitive_account.this,
+    azurerm_ai_services.this,
     azurerm_private_endpoint.endpoint
   ]
 }
 
+
 resource "azurerm_role_assignment" "oai" {
   role_definition_name = "Storage Blob Data Contributor"
-  scope                = azurerm_cognitive_account.this.id
-  principal_id         = azurerm_cognitive_account.this.identity[0].principal_id
-}
-
-#### Modifying cognitive services to latest ai services ###############
-resource "azurerm_ai_services" "cognitive_service" {
-  name                = "appliedaisvcs-${var.cognitive_name}"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  sku_name            = "S0"
-
-
-  tags = {
-    Acceptance = "Test"
-  }
-  identity {
-    type = "SystemAssigned"
-  }
-}
-
-resource "azurerm_role_assignment" "appai" {
-  role_definition_name = "Storage Blob Data Contributor"
-  scope                = azurerm_ai_services.cognitive_service.id
-  principal_id         = azurerm_ai_services.cognitive_service.identity[0].principal_id
+  scope                = azurerm_ai_services.this.id
+  principal_id         = azurerm_ai_services.this.identity[0].principal_id
 }
 
