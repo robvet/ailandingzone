@@ -56,34 +56,6 @@ resource "azurerm_ai_services" "this" {
 
 }
 
-/*
-resource "azapi_resource" "this"{
-  type = "Microsoft.CognitiveServices/accounts@2024-10-01"
-  name = var.cognitive_name
-  location = var.location
-  parent_id = "/subscriptions/aa8123d8-cdcc-443a-a2a1-a0ed191da95c/resourceGroups/rg-ai-prod-new"
-  identity {
-    type = "SystemAssigned"
-  }
-
-  body = {
-    "name" = var.cognitive_name,
-    "properties" = {
-      "customSubDomainName" = lower(var.cognitive_name),
-      "apiProperties" = {
-            "statisticsEnabled" = "false"
-        }
-    },
-    "kind" = "AIServices",
-    "sku" = {
-        "name" = var.cognitive_sku
-    }
-    }
-
-  response_export_values = ["*"]
-}
-*/
-
 # data resource to get the vnet
 data "azurerm_virtual_network" "this" {
   provider            = azurerm.platform
