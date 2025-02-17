@@ -1,4 +1,5 @@
 variable "resource_group_id" {}
+variable "resource_group_name" {}
 variable "location" {}
 variable "machine_learning_workspace_name" {}
 variable "appi_id" {}
@@ -14,8 +15,7 @@ variable "search_admin_key" {}
 variable "openai_key" {}
 variable "tenantid" {}
 variable "compute_subnet_id" {}
-
-
+variable "target" {}
 variable "virtual_network_name" {}
 variable "virtual_network_resource_group_name" {}
 variable "private_endpoints_subnet_name" {}
