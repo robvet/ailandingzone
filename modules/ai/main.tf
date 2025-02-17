@@ -2,205 +2,44 @@
 terraform {
   required_providers {
     azurerm = {
-      source                = "hashicorp/azurerm"
-      version               = "~> 3.80"
+      source  = "hashicorp/azurerm"
+      version = "4.19.0"
       configuration_aliases = [azurerm.platform, azurerm.analytics]
     }
     azapi = {
-      source = "Azure/azapi"
+      source  = "Azure/azapi"
     }
   }
 }
 
 # --- This module creates an ai studio resource --- #
 
-resource "azapi_resource" "this" {
-  type      = "Microsoft.MachineLearningServices/workspaces@2024-01-01-preview"
-  name      = var.machine_learning_workspace_name
-  parent_id = var.resource_group_id
-  location  = var.location
+resource "azurerm_ai_foundry" "this" {
+  name                       = var.machine_learning_workspace_name
+  location                   = var.location
+  resource_group_name        = var.resource_group_name
+  storage_account_id         = var.storage_account_id
+  key_vault_id               = var.key_vault_id
+  container_registry_id      = var.acr_id
+  application_insights_id    = var.appi_id
+  public_network_access      = "Disabled"
+  friendly_name              = "aistudio-east-new"
+  high_business_impact_enabled = true
+  managed_network {
+    isolation_mode             = "AllowInternetOutbound"
+  }
   identity {
     type = "SystemAssigned"
   }
-  body = {
-    kind = "Hub",
-    sku = {
-      name = "Basic",
-      tier = "Basic"
-    },
-    properties = {
-      "keyVault" : var.key_vault_id,
-      "containerRegistry" : var.acr_id,
-      "applicationInsights" : var.appi_id,
-      "managedNetwork" : {
-        "isolationMode" : "AllowInternetOutbound",
-        "outboundRules" : {
-          "bloboutbound" : {
-            "category" : "UserDefined",
-            "destination" : {
-              "serviceResourceId" : var.storage_account_id,
-              "sparkEnabled" : true,
-              "sparkStatus" : "active",
-              "subresourceTarget" : "blob"
-            },
-            "type" : "PrivateEndpoint"
-          },
-          "fileoutbound" : {
-            "category" : "UserDefined",
-            "destination" : {
-              "serviceResourceId" : var.storage_account_id,
-              "sparkEnabled" : true,
-              "sparkStatus" : "active",
-              "subresourceTarget" : "file"
-            },
-            "type" : "PrivateEndpoint"
-          },
-          "searchoutbound" : {
-            "category" : "UserDefined",
-            "destination" : {
-              "serviceResourceId" : var.search_id,
-              "sparkEnabled" : true,
-              "sparkStatus" : "active",
-              "subresourceTarget" : "searchService"
-            },
-            "type" : "PrivateEndpoint"
-          },
-          "openaioutbound" : {
-            "category" : "UserDefined",
-            "destination" : {
-              "serviceResourceId" : var.openai_id,
-              "sparkEnabled" : true,
-              "sparkStatus" : "active",
-              "subresourceTarget" : "account"
-            },
-            "type" : "PrivateEndpoint"
-          },
-          "kvoutbound" : {
-            "category" : "UserDefined",
-            "destination" : {
-              "serviceResourceId" : var.key_vault_id,
-              "sparkEnabled" : true,
-              "sparkStatus" : "active",
-              "subresourceTarget" : "vault"
-            },
-            "type" : "PrivateEndpoint"
-          }
-        }
-      },
-      "publicNetworkAccess" : "Disabled",
-      "serverlessComputeSettings" : null,
-      "storageAccount" : var.storage_account_id,
-      "systemDatastoresAuthMode" : null,
-      "v1LegacyMode" : false,
-      "workspaceHubConfig" : {
-        "defaultWorkspaceResourceGroup" : var.resource_group_id
-      }
-    },
-    tags = {
-    }
-  }
 }
 
-# --- This module creates an ai project resource --- #
-resource "azapi_resource" "aiproject" {
-  type      = "Microsoft.MachineLearningServices/workspaces@2024-01-01-preview"
-  name      = "aiproject123"
-  parent_id = var.resource_group_id
-  location  = var.location
+resource "azurerm_ai_foundry_project" "this" {
+  name               = "aiproject123"
+  location           = var.location
+  ai_services_hub_id = azurerm_ai_foundry.this.id
+  friendly_name      = "aiprojdefaultnew"
   identity {
     type = "SystemAssigned"
-  }
-  body = {
-    kind = "Project",
-    sku = {
-      name = "Basic",
-      tier = "Basic"
-    },
-    properties = {
-      "friendlyName" : "aiprojdefault1",
-      "v1LegacyMode" : false,
-      "publicNetworkAccess" : "Disabled",
-      "ipAllowlist" : [],
-      "enableSoftwareBillOfMaterials" : false,
-      "hubResourceId" : azapi_resource.this.id,
-      "enableDataIsolation" : true
-    },
-    tags = {
-      "ailandingzone" = "true"
-    }
-  }
-}
-
-# --- -This module creates a compute instance resource --------------------------------------------- #
-# --- This resource is disabled because of issues in the current version of the azapi provider ------#
-
-/*
-resource "azurerm_machine_learning_compute_instance" "this" {
-  name                          = "ci${var.machine_learning_workspace_name}${count.index}"
-  machine_learning_workspace_id = azapi_resource.this.id
-  virtual_machine_size          = "Standard_DS3_v2"
-  authorization_type            = "personal"
-  location                      = var.location
-  count                         = length(var.user_principal_ids)
-  node_public_ip_enabled        = true
-  assign_to_user {
-    object_id = var.user_principal_ids[count.index]
-    tenant_id = var.tenantid
-  }
-  description = "default compute instance"
-  identity {
-    type = "SystemAssigned"
-  }
-  tags = {
-    "ailandingzone" = "true"
-  }
-}
-*/
-
-# --- This module creates a openai connection resource --------------------------------------------- #
-# --- This resource is disabled because of issues in the current version of the azapi provider ------#
-/*
-resource "azapi_resource" "oaiconn" {
-  type      = "Microsoft.MachineLearningServices/workspaces/connections@2024-04-01-preview"
-  name      = "azoaisecconn"
-  parent_id = azapi_resource.this.id
-  body = {
-    "properties" : {
-      "authType" : "ApiKey",
-      "category" : "AzureOpenAI",
-      "credentials" : {
-        "key" : var.openai_key
-      }
-      "target" : "https://${var.openai_name}.openai.azure.com/",
-      "isSharedToAll" : true,
-      "metadata" : {
-        "ApiType" : "AzureOpenAI"
-      }
-      "sharedUserList" : []
-    }
-  }
-}
-*/
-
-# --- This module creates a ai search connection resource --- #
-resource "azapi_resource" "cogsrchconn" {
-  type      = "Microsoft.MachineLearningServices/workspaces/connections@2024-04-01-preview"
-  name      = "cogsrchconn"
-  parent_id = azapi_resource.this.id
-  body = {
-    "properties" : {
-      "authType" : "ApiKey",
-      "category" : "CognitiveSearch",
-      "credentials" : {
-        "key" : var.search_admin_key
-      }
-      "target" : "https://${var.search_name}.search.windows.net",
-      "isSharedToAll" : true,
-      "metadata" : {
-        "ApiType" : "CognitiveSearch"
-      }
-      "sharedUserList" : []
-    }
   }
 }
 
@@ -226,7 +65,7 @@ resource "azurerm_private_endpoint" "this" {
 
   private_service_connection {
     name                           = var.private_endpoints.privateEndpointName
-    private_connection_resource_id = azapi_resource.this.id
+    private_connection_resource_id = azurerm_ai_foundry.this.id
     is_manual_connection           = false
     subresource_names              = [var.private_endpoints.privateEndpointGroupId]
   }
@@ -242,7 +81,7 @@ resource "azurerm_private_endpoint" "this" {
 
 resource "azurerm_role_assignment" "rbac" {
   count                = length(var.user_principal_ids)
-  scope                = azapi_resource.this.id
+  scope                = azurerm_ai_foundry.this.id
   role_definition_name = "Azure AI Developer"
   principal_id         = var.user_principal_ids[count.index]
 }
