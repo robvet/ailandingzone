@@ -81,8 +81,6 @@ locals {
 
 }
 
-# ----------------- Initialize the modules --------------------  #
-# ------------This module creates a storage account ------------ #
 module "st" {
   source               = "./modules/st"
   location             = var.location
@@ -151,6 +149,7 @@ module "ai" {
   source                               = "./modules/ai"
   resource_group_id                    = data.azurerm_resource_group.rg.id
   location                             = var.location
+  resource_group_name                  = data.azurerm_resource_group.rg.name 
   machine_learning_workspace_name      = local.mlw_name
   appi_id                              = module.appi.id
   acr_id                               = module.cr.id
@@ -170,7 +169,7 @@ module "ai" {
   private_dns_zone_resource_group_name = var.private_dns_zone_resource_group_name
   virtual_network_resource_group_name  = var.virtual_network_resource_group_name
   private_endpoints_subnet_name        = var.private_endpoints_subnet_name
-
+  target                               = module.openai.AIServicesResource
 }
 
 # ---------- This module creates a private endpoint -------------- #
@@ -201,6 +200,7 @@ module "openai" {
   source                               = "./modules/aiservices"
   resource_group_name                  = data.azurerm_resource_group.rg.name
   location                             = var.location
+  resource_group_id                    = data.azurerm_resource_group.rg.id
   cognitive_name                       = "${var.openai_name}-${local.name_sufix}"
   tags                                 = var.tags
   cognitive_private_endpoint_name      = "pe-${local.name_sufix}-${var.openai_private_endpoint_name}"
@@ -210,6 +210,8 @@ module "openai" {
   private_endpoints_subnet_name        = var.private_endpoints_subnet_name
   private_dns_zone_resource_group_name = var.private_dns_zone_resource_group_name
 }
+
+
 
 # ---------- This module creates a role-based access control ------------------ #
 # ---------- Create oai contrb, user access for given users  ------------------ #
