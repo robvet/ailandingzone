@@ -1,7 +1,7 @@
 output "id" {
-  value = azapi_resource.this.id
+  value = azurerm_ai_foundry.this.id
 }
 
 output "name" {
-  value = azapi_resource.this.name
+  value = azurerm_ai_foundry.this.name
 }
