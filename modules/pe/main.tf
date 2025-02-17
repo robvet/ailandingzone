@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source                = "hashicorp/azurerm"
-      version               = "~> 3.80"
+      version               = "4.19.0"
       configuration_aliases = [azurerm.platform, azurerm.analytics]
     }
   }
