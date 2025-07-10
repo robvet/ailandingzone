@@ -1,0 +1,47 @@
+# Sample Terraform variables file for Azure AI Foundry
+# Copy this to terraform.tfvars and update with your actual values
+
+# Authentication Configuration
+subscription_id = "YOUR_SUBSCRIPTION_ID"
+
+# Core Configuration
+project_name          = "aifoundry"
+project_friendly_name = "AI Foundry Project"
+project_description   = "Secure AI Foundry environment with agent capabilities"
+location              = "eastus2"
+resource_group_name   = "rg-agents"
+
+# Existing Networking Configuration
+vnet_id                    = "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/YOUR_NETWORK_RG/providers/Microsoft.Network/virtualNetworks/YOUR_VNET_NAME"
+private_endpoint_subnet_id = "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/YOUR_NETWORK_RG/providers/Microsoft.Network/virtualNetworks/YOUR_VNET_NAME/subnets/pe-subnet"
+agent_subnet_id            = "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/YOUR_NETWORK_RG/providers/Microsoft.Network/virtualNetworks/YOUR_VNET_NAME/subnets/agent-subnet" # Optional for advanced agent setup
+
+# Private DNS Zone IDs - Update with your actual zone IDs from your DNS zones resource group
+storage_blob_dns_zone_id       = "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/YOUR_DNS_RG/providers/Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net"
+storage_file_dns_zone_id       = "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/YOUR_DNS_RG/providers/Microsoft.Network/privateDnsZones/privatelink.file.core.windows.net"
+key_vault_dns_zone_id          = "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/YOUR_DNS_RG/providers/Microsoft.Network/privateDnsZones/privatelink.vaultcore.azure.net"
+search_dns_zone_id             = "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/YOUR_DNS_RG/providers/Microsoft.Network/privateDnsZones/privatelink.search.windows.net"
+cosmos_db_dns_zone_id          = "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/YOUR_DNS_RG/providers/Microsoft.Network/privateDnsZones/privatelink.documents.azure.com"
+container_registry_dns_zone_id = "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/YOUR_DNS_RG/providers/Microsoft.Network/privateDnsZones/privatelink.azurecr.io"
+ai_foundry_dns_zone_id         = "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/YOUR_DNS_RG/providers/Microsoft.Network/privateDnsZones/privatelink.cognitiveservices.azure.com"
+openai_dns_zone_id             = "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/YOUR_DNS_RG/providers/Microsoft.Network/privateDnsZones/privatelink.openai.azure.com"
+ai_services_dns_zone_id        = "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/YOUR_DNS_RG/providers/Microsoft.Network/privateDnsZones/privatelink.services.ai.azure.com"
+
+# Model Configuration
+model_deployment_name = "gpt-4o"
+model_format          = "OpenAI"
+model_version         = "2024-05-13"
+model_sku_name        = "Standard"
+model_capacity        = 10
+
+# Service Configuration
+search_service_sku = "standard" # Options: free, basic, standard, standard2, standard3
+
+# Tags
+tags = {
+  Environment = "development"
+  Project     = "ai-foundry"
+  Owner       = "enterprise-agents"
+  Purpose     = "ai-agents"
+  ManagedBy   = "terraform"
+}
